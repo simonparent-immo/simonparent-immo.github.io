@@ -255,6 +255,8 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 .jours{scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}.jours button{scroll-snap-align:start}
 #suite1{width:100%;justify-content:center}
 @media (max-width:700px){.etapes{font-size:11px}.types{grid-template-columns:repeat(3,minmax(0,1fr))}.types button{padding:10px 8px}.types small{font-size:11px}.types b{font-size:14px}.panneau .deux{grid-template-columns:1fr}}
+
+.projet[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -327,8 +329,22 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <label class="f" for="cTel">Téléphone<input id="cTel" type="tel" autocomplete="tel"></label>
 <label class="f" for="cEmail">Email<input id="cEmail" type="email" autocomplete="email"></label>
 </div>
-<label class="f" for="cProfil">Votre projet<select id="cProfil"><option value="Prospect acquéreur">J'achète</option><option value="Prospect vendeur">Je vends</option><option value="Prospect acquéreur">Autre question</option></select></label>
-<label class="f" for="cMsg">Message<textarea id="cMsg"></textarea></label>
+<label class="f" for="cProfil">Votre projet<select id="cProfil" required><option value="">Choisissez votre projet</option><option value="Prospect acquéreur">J'achète</option><option value="Prospect vendeur">Je vends</option><option value="Achat et vente">Je vends et j'achète</option><option value="Investisseur">J'investis (locatif, rendement)</option><option value="Autre">Autre question</option></select></label>
+<div id="cAchat" class="projet" style="display:grid;gap:10px">
+<div class="deux"><label class="f" for="aType">Type de bien<select id="aType"><option value="">Indifférent</option><option>Maison</option><option>Appartement</option><option>Terrain</option><option>Immeuble</option><option>Autre</option></select></label>
+<label class="f" for="aBudget">Budget maximum (€)<input id="aBudget" inputmode="numeric" placeholder="Ex. : 250 000"></label></div>
+<label class="f" for="aVille">Ville(s) ou secteur recherchés<input id="aVille" placeholder="Ex. : Dijon, Talant, Fontaine-lès-Dijon"></label>
+<div class="deux"><label class="f" for="aFin">Financement<select id="aFin"><option value="">Choisir</option><option>Prêt accordé</option><option>Prêt en cours d'étude</option><option>Pas encore vu ma banque</option><option>Comptant</option><option>Vente d'un bien à prévoir</option></select></label>
+<label class="f" for="aDelai">Délai<select id="aDelai"><option value="">Choisir</option><option>Dès que possible</option><option>Dans 3 mois</option><option>Dans 6 mois</option><option>Plus tard, je me renseigne</option></select></label></div>
+</div>
+<div id="cVente" class="projet" hidden style="display:grid;gap:10px">
+<div class="deux"><label class="f" for="vType">Type de bien<select id="vType"><option value="">Choisir</option><option>Maison</option><option>Appartement</option><option>Terrain</option><option>Immeuble</option><option>Autre</option></select></label>
+<label class="f" for="vVille">Ville du bien<input id="vVille" autocomplete="address-level2"></label></div>
+<div class="deux"><label class="f" for="vSurf">Surface (m²)<input id="vSurf" inputmode="decimal"></label>
+<label class="f" for="vDelai">Délai de vente<select id="vDelai"><option value="">Choisir</option><option>Dès que possible</option><option>Dans 3 mois</option><option>Dans 6 mois</option><option>Je me renseigne</option></select></label></div>
+<label class="f" for="vPrix">Prix souhaité (€, facultatif)<input id="vPrix" inputmode="numeric"></label>
+</div>
+<label class="f" for="cMsg">Message (facultatif)<textarea id="cMsg"></textarea></label>
 <input class="piege" id="cSite" tabindex="-1" autocomplete="off" aria-hidden="true">
 <label class="rgpd" for="cRgpd"><input type="checkbox" id="cRgpd"><span>J'accepte que mes coordonnées soient utilisées pour répondre à ma demande. Elles ne sont jamais transmises à des tiers.</span></label>
 <div id="cRetour" hidden></div>
@@ -502,7 +518,7 @@ document.querySelectorAll('.vignettes button').forEach(x => x.classList.toggle('
 });
 if ($('#bVisite')) $('#bVisite').onclick = () => reserver('Visite', b);
 if ($('#bEstimV')) $('#bEstimV').onclick = () => reserver('Estimation');
-$('#bQuestion').onclick = () => { fermer(); $('#cMsg').value = `Bonjour, je suis intéressé(e) par le bien ${b.reference ? 'réf. ' + b.reference : ''} (${b.type} à ${b.ville}, ${euro(b.prix)}). `; $('#formContact').dataset.bien = b.id; $('#contact').scrollIntoView({ behavior: 'smooth' }); $('#cPrenom').focus(); };
+$('#bQuestion').onclick = () => { fermer(); $('#cMsg').value = `Bonjour, je suis intéressé(e) par le bien ${b.reference ? 'réf. ' + b.reference : ''} (${b.type} à ${b.ville}, ${euro(b.prix)}). `; $('#formContact').dataset.bien = b.id; $('#cProfil').value = 'Prospect acquéreur'; if (typeof majProjet === 'function') majProjet(); $('#contact').scrollIntoView({ behavior: 'smooth' }); $('#cPrenom').focus(); };
 }
 
 // ─── Réservation en 3 étapes
@@ -592,17 +608,24 @@ etape1();
 $('#formContact').onsubmit = async e => {
 e.preventDefault();
 const v = id => $('#' + id).value.trim(), retour = $('#cRetour');
-const erreur = !v('cNom') ? 'Indiquez votre nom.' : (!v('cEmail') && !v('cTel')) ? 'Indiquez un email ou un téléphone pour que je puisse vous répondre.' : !$('#cRgpd').checked ? 'Cochez la case pour accepter le traitement de vos coordonnées.' : '';
+const erreur = !v('cNom') ? 'Indiquez votre nom.' : !v('cProfil') ? 'Indiquez votre projet.' : (!v('cEmail') && !v('cTel')) ? 'Indiquez un email ou un téléphone pour que je puisse vous répondre.' : !$('#cRgpd').checked ? 'Cochez la case pour accepter le traitement de vos coordonnées.' : '';
 if (erreur) { retour.hidden = false; retour.className = 'msg err'; retour.textContent = erreur; return; }
-const btn = $('#cEnvoyer'); btn.disabled = true; btn.textContent = 'Envoi…';
-try {
-await api('contact', { prenom: v('cPrenom'), nom: v('cNom'), telephone: v('cTel'), email: v('cEmail'), profil: v('cProfil'), message: v('cMsg'), bienId: $('#formContact').dataset.bien || '', consentement: true, website: v('cSite') });
+const btn = $('#cEnvoyer'); btn.disabled = true;
+const num = id => v(id).replace(/[^\d,.]/g, '').replace(',', '.');
+const prof = v('cProfil');
+const donnees = { prenom: v('cPrenom'), nom: v('cNom'), telephone: v('cTel'), email: v('cEmail'), profil: prof, message: v('cMsg'), bienId: $('#formContact').dataset.bien || '', consentement: true, website: v('cSite') };
+if (['Prospect acquéreur', 'Achat et vente', 'Investisseur'].indexOf(prof) >= 0) Object.assign(donnees, { types: v('aType'), budget: num('aBudget'), secteurs: v('aVille'), financement: v('aFin'), delai: v('aDelai') });
+if (['Prospect vendeur', 'Achat et vente'].indexOf(prof) >= 0) Object.assign(donnees, { typeBien: v('vType'), ville: v('vVille'), surface: num('vSurf'), delai: v('vDelai'), prix: num('vPrix') });
 retour.hidden = false; retour.className = 'msg ok';
-retour.textContent = DEMO_MODE ? "Démonstration : le message n'a pas été envoyé." : 'Merci, votre message est bien arrivé. Je vous recontacte rapidement.';
-e.target.reset(); delete $('#formContact').dataset.bien;
-} catch (er) { retour.hidden = false; retour.className = 'msg err'; retour.textContent = er.message; }
-finally { btn.disabled = false; btn.textContent = 'Envoyer'; }
+retour.textContent = DEMO_MODE ? "Démonstration : le message n'a pas été envoyé." : 'Merci, votre message est bien parti. Je vous recontacte rapidement.';
+const form = e.target;
+api('contact', donnees).then(() => { form.reset(); delete form.dataset.bien; majProjet(); })
+.catch(er => { retour.className = 'msg err'; retour.textContent = (er.message || 'Envoi impossible') + ' Vos informations sont toujours là : réessayez.'; })
+.finally(() => { btn.disabled = false; });
 };
+function majProjet() { const p = $('#cProfil').value; $('#cAchat').hidden = ['Prospect acquéreur', 'Achat et vente', 'Investisseur'].indexOf(p) < 0; $('#cVente').hidden = ['Prospect vendeur', 'Achat et vente'].indexOf(p) < 0; }
+$('#cProfil').onchange = majProjet; majProjet();
+['aBudget', 'vPrix'].forEach(id => $('#' + id).addEventListener('input', ev => { const d = ev.target.value.replace(/\D/g, ''); ev.target.value = d ? Number(d).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0') : ''; }));
 
 ['#ctaEstim', '#ctaEstim2'].forEach(s => $(s).onclick = () => reserver('Estimation'));
 $('#ctaRdv').onclick = () => reserver('Visite');
