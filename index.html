@@ -245,6 +245,16 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 .filtres select{min-width:150px}
 .f-info{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-6px 0 14px;font-size:14px;color:var(--gris)}
 .f-info button{background:none;border:0;color:var(--or);font:inherit;font-weight:600;cursor:pointer;padding:0}
+
+.p-corps{grid-template-columns:minmax(0,1fr)}.p-corps>*,#zone,#dispo{min-width:0;max-width:100%}
+.panneau{overflow-x:hidden}
+.etapes span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.types{grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr))}
+.heures{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
+.heures button{padding:12px 6px;font-size:16px;font-variant-numeric:tabular-nums}
+.jours{scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}.jours button{scroll-snap-align:start}
+#suite1{width:100%;justify-content:center}
+@media (max-width:700px){.etapes{font-size:11px}.types{grid-template-columns:repeat(3,minmax(0,1fr))}.types button{padding:10px 8px}.types small{font-size:11px}.types b{font-size:14px}.panneau .deux{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -286,7 +296,6 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <div class="filtres">
 <select id="fType" aria-label="Type de bien"><option value="">Tous les types</option></select>
 <select id="fVille" aria-label="Ville"><option value="">Toutes les villes</option></select>
-<select id="fDispo" aria-label="Disponibilité"><option value="tous">Tous les biens</option><option value="dispo">Disponibles uniquement</option><option value="Vendu">Vendus</option></select>
 <select id="fBudget" aria-label="Budget maximum">
 <option value="">Tous les budgets</option><option>150000</option><option>250000</option><option>350000</option><option>500000</option><option>750000</option>
 </select>
@@ -350,7 +359,7 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const euro = n => n ? Number(n).toLocaleString('fr-FR') + ' €' : '';
+const euro = n => n ? Number(n).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0') + '\u00a0€' : '';
 const DPE_COUL = {A:'#009c6d',B:'#52b153',C:'#a5cc74',D:'#f4e70f',E:'#f0b40f',F:'#eb8235',G:'#d7221f'};
 const GES_COUL = {A:'#a4dbf8',B:'#8cb4d3',C:'#7792b1',D:'#5d6f8f',E:'#4d5271',F:'#393551',G:'#281b35'};
 const MAISON = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"><path d="M8 30 32 10l24 20"/><path d="M14 26v28h36V26"/><path d="M27 54V40h10v14"/></svg>';
@@ -385,7 +394,7 @@ const src = b.photos && b.photos[0];
 return src ? `<img src="${esc(taille(src, 800))}" alt="${esc(b.titre || b.type)}" loading="lazy" decoding="async">` : `<div class="ph">${MAISON}</div>`;
 }
 function caracs(b) {
-return [b.surface ? b.surface + ' m²' : '', b.pieces ? b.pieces + ' pièces' : '', b.chambres ? b.chambres + ' ch.' : '', b.terrain ? 'terrain ' + b.terrain + ' m²' : ''].filter(Boolean).join(' · ');
+return [b.surface ? String(b.surface).replace('.', ',') + ' m²' : '', b.pieces ? b.pieces + ' pièces' : '', b.chambres ? b.chambres + ' ch.' : '', b.terrain ? 'terrain ' + b.terrain + ' m²' : ''].filter(Boolean).join(' · ');
 }
 function mentionPrix(b) {
 if (b.honorairesCharge === 'Acquéreur' && b.honoraires && b.prix) {
@@ -423,12 +432,12 @@ return t.length ? '<div class="tags">' + t.join('') + '</div>' : '';
 }
 function afficherBiens() {
 const t = $('#fType').value, v = $('#fVille').value, m = Number($('#fBudget').value) || Infinity;
-const ordre = b => b.statut === 'Vendu' ? 2 : (b.statut === 'Sous offre' || b.statut === 'Sous compromis') ? 1 : 0;
-const fs = $('#fDispo') ? $('#fDispo').value : 'tous';
-const liste = BIENS.filter(b => (!t || b.type === t) && (!v || b.ville === v) && (m === Infinity || !b.prix || Number(b.prix) <= m) && (fs === 'dispo' ? b.statut !== 'Vendu' : fs === 'tous' || b.statut === fs)).sort((a, c) => ordre(a) - ordre(c));
-const actif = t || v || m !== Infinity || fs !== 'tous';
+const ordre = b => (b.perso === false ? 10 : 0) + (b.statut === 'Sous offre' ? 1 : 0);
+const fs = 'tous';
+const liste = BIENS.filter(b => (!t || b.type === t) && (!v || b.ville === v) && (m === Infinity || !b.prix || Number(b.prix) <= m) && ['Vendu', 'Sous compromis', 'Retiré'].indexOf(b.statut) < 0).sort((a, c) => ordre(a) - ordre(c));
+const actif = t || v || m !== Infinity;
 if ($('#fInfo')) { $('#fInfo').hidden = !actif; $('#fNb').textContent = liste.length + ' bien' + (liste.length > 1 ? 's' : '') + ' correspond' + (liste.length > 1 ? 'ent' : '') + ' à votre recherche'; }
-const dispo = BIENS.filter(b => b.statut !== 'Vendu').length;
+const dispo = BIENS.filter(b => ['Vendu', 'Sous compromis', 'Retiré'].indexOf(b.statut) < 0).length;
 $('#titreBiens').textContent = dispo ? `${dispo} bien${dispo > 1 ? 's' : ''} en vente` : 'Mes biens en vente';
 $('#grille').innerHTML = liste.length ? liste.map(b => `
 <button class="bien${b.statut === 'Vendu' ? ' est-vendu' : ''}" data-id="${esc(b.id)}" aria-label="${esc(b.titre || b.type)}">
@@ -470,7 +479,7 @@ ${photos.length > 1 ? `<div class="vignettes">${photos.map((p, i) => `<button da
 <div class="ref">${esc(mentionPrix(b))}</div>
 </div>
 <div class="chiffres">
-<div><span>Surface</span><b class="mono">${b.surface ? esc(b.surface) + ' m²' : '—'}</b></div>
+<div><span>Surface</span><b class="mono">${b.surface ? esc(String(b.surface).replace('.', ',')) + ' m²' : '—'}</b></div>
 <div><span>Pièces</span><b class="mono">${esc(b.pieces || '—')}</b></div>
 <div><span>Chambres</span><b class="mono">${esc(b.chambres || '—')}</b></div>
 <div><span>Terrain</span><b class="mono">${b.terrain ? esc(b.terrain) + ' m²' : '—'}</b></div>
@@ -599,8 +608,8 @@ finally { btn.disabled = false; btn.textContent = 'Envoyer'; }
 $('#ctaRdv').onclick = () => reserver('Visite');
 $('#navRdv').onclick = e => { e.preventDefault(); document.querySelector('.carte-rdv').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
 $('#ctaVisite2').onclick = () => reserver('Visite');
-['#fType', '#fVille', '#fBudget', '#fDispo'].forEach(s => { $(s).onchange = afficherBiens; $(s).oninput = afficherBiens; });
-$('#fRaz').onclick = () => { $('#fType').value = ''; $('#fVille').value = ''; $('#fBudget').value = ''; $('#fDispo').value = 'tous'; afficherBiens(); };
+['#fType', '#fVille', '#fBudget'].forEach(s => { $(s).onchange = afficherBiens; $(s).oninput = afficherBiens; });
+$('#fRaz').onclick = () => { $('#fType').value = ''; $('#fVille').value = ''; $('#fBudget').value = ''; afficherBiens(); };
 
 (async function demarrer() {
 $('#bandeauDemo').hidden = !DEMO_MODE;
