@@ -330,14 +330,14 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <label class="f" for="cEmail">Email<input id="cEmail" type="email" autocomplete="email"></label>
 </div>
 <label class="f" for="cProfil">Votre projet<select id="cProfil" required><option value="">Choisissez votre projet</option><option value="Prospect acquéreur">J'achète</option><option value="Prospect vendeur">Je vends</option><option value="Achat et vente">Je vends et j'achète</option><option value="Investisseur">J'investis (locatif, rendement)</option><option value="Autre">Autre question</option></select></label>
-<div id="cAchat" class="projet" style="display:grid;gap:10px">
+<div id="cAchat" class="projet" style="display:grid;gap:10px"><div class="eyebrow" style="margin-top:4px">Votre recherche</div>
 <div class="deux"><label class="f" for="aType">Type de bien<select id="aType"><option value="">Indifférent</option><option>Maison</option><option>Appartement</option><option>Terrain</option><option>Immeuble</option><option>Autre</option></select></label>
 <label class="f" for="aBudget">Budget maximum (€)<input id="aBudget" inputmode="numeric" placeholder="Ex. : 250 000"></label></div>
 <label class="f" for="aVille">Ville(s) ou secteur recherchés<input id="aVille" placeholder="Ex. : Dijon, Talant, Fontaine-lès-Dijon"></label>
 <div class="deux"><label class="f" for="aFin">Financement<select id="aFin"><option value="">Choisir</option><option>Prêt accordé</option><option>Prêt en cours d'étude</option><option>Pas encore vu ma banque</option><option>Comptant</option><option>Vente d'un bien à prévoir</option></select></label>
 <label class="f" for="aDelai">Délai<select id="aDelai"><option value="">Choisir</option><option>Dès que possible</option><option>Dans 3 mois</option><option>Dans 6 mois</option><option>Plus tard, je me renseigne</option></select></label></div>
 </div>
-<div id="cVente" class="projet" hidden style="display:grid;gap:10px">
+<div id="cVente" class="projet" hidden style="display:grid;gap:10px"><div class="eyebrow" style="margin-top:4px">Le bien que vous vendez</div>
 <div class="deux"><label class="f" for="vType">Type de bien<select id="vType"><option value="">Choisir</option><option>Maison</option><option>Appartement</option><option>Terrain</option><option>Immeuble</option><option>Autre</option></select></label>
 <label class="f" for="vVille">Ville du bien<input id="vVille" autocomplete="address-level2"></label></div>
 <div class="deux"><label class="f" for="vSurf">Surface (m²)<input id="vSurf" inputmode="decimal"></label>
