@@ -4,9 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Simon Parent Immobilier</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1f2f42">
 <meta name="description" content="Biens à vendre autour de Dijon et Fontaine-lès-Dijon. Prise de rendez-vous en ligne avec Simon Parent, conseiller VESTA MB.">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://drive.google.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600&display=swap">
 <style>
 :root{
 --pierre:#eef0ec;
@@ -19,9 +27,9 @@
 --marine:#1f2f42;
 --ok:#2e7a4d;
 --err:#b0362c;
---display:"Young Serif", Georgia, "Times New Roman", serif;
+--display:"Cormorant Garamond", Garamond, Georgia, "Times New Roman", serif;
 --texte:"Manrope", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
---mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+--mono:ui-monospace, Menlo, Consolas, monospace;
 --r:12px;
 color-scheme:light;
 }
@@ -32,7 +40,7 @@ color-scheme:light;
 [hidden]{display:none!important}
 body{margin:0;background:var(--pierre);color:var(--encre);font:16px/1.55 var(--texte);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1,h2,h3{font-family:var(--display);font-weight:500;text-wrap:balance;margin:0;letter-spacing:0}
 a{color:inherit}
 button{font:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:2px solid var(--or);outline-offset:2px}
@@ -40,14 +48,15 @@ button{font:inherit;cursor:pointer;color:inherit}
 .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--or);font-weight:700}
 header.site{padding-block:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .marque{display:flex;flex-direction:column;line-height:1.15}
-.marque b{font-family:var(--display);font-weight:400;font-size:22px}
+.marque b{font-family:var(--display);font-weight:600;font-size:24px}
 .marque span{font-size:12.5px;color:var(--gris)}
 header.site nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
 header.site nav a{text-decoration:none;font-weight:600;font-size:14px;padding:8px 12px;border-radius:999px}
 header.site nav a:hover{background:var(--papier)}
 header.site nav a.cta{background:var(--marine);color:#fff}
 .hero{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:end;padding-block:28px 36px;border-bottom:1px solid var(--trait)}
-.hero h1{font-size:clamp(34px,5.4vw,62px);line-height:1.04}
+.hero h1{font-size:clamp(34px,5vw,58px);line-height:1.08}
+.hero h1 em{font-style:italic;font-weight:500}
 .hero h1 em{font-style:normal;color:var(--or)}
 .hero p{color:var(--gris);max-width:52ch;margin:16px 0 0}
 .hero .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
@@ -76,7 +85,7 @@ section{padding-block:40px}
 .photo .tag{position:absolute;left:12px;top:12px;background:var(--marine);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
 .photo .tag.ex{background:var(--or)}
 .bien .corps{padding:14px 16px 16px;display:grid;gap:6px;flex:1}
-.bien .prix{font-family:var(--display);font-size:24px}
+.bien .prix{font-family:var(--texte);font-weight:600;font-size:21px;letter-spacing:-.01em}
 .bien .carac{font-size:14px;color:var(--gris)}
 .bien .ville{font-weight:700}
 .bien .bas{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:8px}
@@ -141,7 +150,7 @@ section{padding-block:40px}
 .types small{color:var(--gris)}
 .jours{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
 .jours button{flex:none;border:1px solid var(--trait);background:var(--papier);border-radius:10px;padding:8px 12px;text-align:center;min-width:72px}
-.jours button b{display:block;font-family:var(--display);font-weight:400;font-size:22px;line-height:1.1}
+.jours button b{display:block;font-family:var(--texte);font-weight:600;font-size:20px;line-height:1.1}
 .jours button small{font-size:12px;color:var(--gris);text-transform:capitalize}
 .jours button.on{background:var(--marine);border-color:var(--marine);color:#fff}
 .jours button.on small{color:#c4cbd4}
@@ -165,6 +174,42 @@ footer p{margin:4px 0}
 .filtres select{flex:1 1 140px;min-width:0}
 }
 @media (max-width:440px){.deux{grid-template-columns:1fr}}
+
+#avis{border-top:1px solid var(--trait)}
+.av-w{padding-block:28px 24px}
+.av-t{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.av-t h2{margin:.2em 0 0;font-size:clamp(20px,3vw,26px)}
+.av-t .ref{margin:0}
+.et{color:#d99a2b;letter-spacing:1px}
+.av-l{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(240px,300px);gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;overscroll-behavior-x:contain;scrollbar-width:thin}
+.av{scroll-snap-align:start;background:var(--papier);border:1px solid var(--trait);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
+.av p{margin:0;flex:1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.av.ouvert p{-webkit-line-clamp:unset;display:block}
+.av-p{font-size:13px;color:var(--gris)}.av-p b{color:var(--encre)}
+.av-m{font-size:12px;margin:8px 0 0}
+.barre-mob{display:none}
+@media (max-width:700px){
+.av-l{grid-auto-columns:82%}
+.hero{padding-block:18px 22px;gap:16px}
+.hero p{font-size:15px}
+.carte-agent{padding:12px 14px;gap:6px}
+.carte-agent .lig:nth-of-type(4){display:none}
+header.site{padding-block:12px;flex-wrap:nowrap}
+header.site nav a:not(.cta){display:none}
+.marque span{font-size:12px}
+.hero .eyebrow{font-size:10px}
+.hero .actions{display:flex;gap:8px}
+.hero .actions .btn{flex:1;justify-content:center;text-align:center;padding-inline:10px}
+.carte-agent #ctaRdv{display:none}
+.barre-mob{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--papier);border-top:1px solid var(--trait);box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.barre-mob .btn{flex:1;justify-content:center;text-align:center}
+body{padding-bottom:76px}
+}
+.peu .filtres{display:none}
+.squelette{background:var(--papier);border:1px solid var(--trait);border-radius:var(--r);overflow:hidden}
+.squelette .sq-i{aspect-ratio:4/3;background:linear-gradient(90deg,var(--trait),var(--pierre),var(--trait));background-size:200% 100%;animation:sq 1.2s infinite linear}
+.squelette .sq-t{height:14px;margin:14px;border-radius:6px;background:var(--trait)}
+@keyframes sq{to{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -172,7 +217,7 @@ footer p{margin:4px 0}
 
 <div class="wrap">
 <header class="site">
-<div class="marque"><b id="nomAgent">Simon Parent</b><span>Conseiller immobilier · VESTA MB Fontaine-lès-Dijon</span></div>
+<div class="marque"><b id="nomAgent">Simon Parent</b><span>Conseiller immobilier · VESTA MB</span></div>
 <nav>
 <a href="#biens">Biens à vendre</a>
 <a href="#estimer">Faire estimer</a>
@@ -211,7 +256,7 @@ footer p{margin:4px 0}
 </select>
 </div>
 </div>
-<div class="grille" id="grille"><div class="chargement"><span class="rond"></span>Chargement des biens…</div></div>
+<div class="grille" id="grille"><div class="squelette"><div class="sq-i"></div><div class="sq-t"></div><div class="sq-t" style="width:60%"></div></div></div>
 </section>
 
 <section id="avis" hidden></section>
@@ -248,6 +293,7 @@ footer p{margin:4px 0}
 </section>
 </div>
 
+<div class="barre-mob"><a class="btn marine" id="mobTel" href="tel:0683706460">Appeler</a><button class="btn plein" id="mobRdv">Rendez-vous</button></div>
 <footer>
 <div class="wrap cols">
 <div><b id="fNom">Simon Parent</b><p id="fStatut">Agent commercial en immobilier (entreprise individuelle)</p><p id="fRsac"></p></div>
@@ -276,6 +322,17 @@ const MAISON = '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strok
 const DEMO_MODE = false;
 const CRM = 'https://script.google.com/macros/s/AKfycbzx5Yd9nGFrzQ9wI-dXqnMdescXUM6Xe1CWu3cZJP09ao22jk1Bj5qfALvyORwmYziL/exec';
 function api(action, params) {
+if ((action === 'biens' || action === 'avis') && !params) return apiCache(action);
+return apiNet(action, params);
+}
+function apiCache(action) {
+const k = 'vit.' + action; let h = null;
+try { h = JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { h = null; }
+const net = apiNet(action).then(d => { try { localStorage.setItem(k, JSON.stringify(d)); } catch (e) {} return d; });
+if (h) { net.then(d => { if (JSON.stringify(d) !== JSON.stringify(h) && window.__maj) window.__maj(action, d); }).catch(() => {}); return Promise.resolve(h); }
+return net;
+}
+function apiNet(action, params) {
 return fetch(CRM, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({}, params || {}, { action: action })) })
 .then(r => r.json(), () => { throw new Error('Connexion impossible, réessayez dans un instant.'); })
 .then(d => { if (d && d.ok) return d; throw new Error((d && d.erreur) || 'Le service ne répond pas, réessayez dans un instant.'); });
@@ -285,9 +342,10 @@ return fetch(CRM, { method: 'POST', headers: { 'Content-Type': 'text/plain;chars
 // ─── État
 let BIENS = [], AGENT = {}, TYPES = [];
 
+function taille(u, w) { return String(u).replace(/sz=w\d+/, 'sz=w' + w); }
 function photoHtml(b, cls) {
 const src = b.photos && b.photos[0];
-return src ? `<img src="${esc(src)}" alt="${esc(b.titre || b.type)}" loading="lazy">` : `<div class="ph">${MAISON}</div>`;
+return src ? `<img src="${esc(taille(src, 800))}" alt="${esc(b.titre || b.type)}" loading="lazy" decoding="async">` : `<div class="ph">${MAISON}</div>`;
 }
 function caracs(b) {
 return [b.surface ? b.surface + ' m²' : '', b.pieces ? b.pieces + ' pièces' : '', b.chambres ? b.chambres + ' ch.' : '', b.terrain ? 'terrain ' + b.terrain + ' m²' : ''].filter(Boolean).join(' · ');
@@ -353,11 +411,11 @@ const photos = b.photos || [];
 ouvrir(b.titre || (b.type + ' · ' + b.ville), `
 <div class="galerie">
 <div class="grande" id="gGrande">${photoHtml(b)}${DEMO_MODE ? '<span class="tag ex" style="position:absolute;left:12px;top:12px;background:var(--or);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">Exemple</span>' : ''}</div>
-${photos.length > 1 ? `<div class="vignettes">${photos.map((p, i) => `<button data-i="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${esc(p)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}
+${photos.length > 1 ? `<div class="vignettes">${photos.map((p, i) => `<button data-i="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${esc(taille(p, 240))}" alt="" loading="lazy" decoding="async"></button>`).join('')}</div>` : ''}
 </div>
 <div>
 <div class="eyebrow">${esc(b.type || '')}${b.ville ? ' · ' + esc(b.ville) + (b.codePostal ? ' (' + esc(b.codePostal) + ')' : '') : ''}</div>
-<div style="font-family:var(--display);font-size:34px;margin-top:4px">${esc(euro(b.prix))}</div>
+<div style="font-family:var(--texte);font-weight:600;font-size:28px;margin-top:4px">${esc(euro(b.prix))}</div>
 <div class="ref">${esc(mentionPrix(b))}</div>
 </div>
 <div class="chiffres">
@@ -489,10 +547,17 @@ $('#ctaRdv').onclick = () => reserver('Visite');
 
 (async function demarrer() {
 $('#bandeauDemo').hidden = !DEMO_MODE;
-try {
-const d = await api('biens');
+window.__avisP = api('avis');
+$('#mobRdv').onclick = () => reserver('Visite');
+const montrer = d => {
 BIENS = d.biens || []; remplirAgent(d.agent || {});
+document.getElementById('biens').classList.toggle('peu', BIENS.length < 5);
 remplirFiltres(); afficherBiens();
+const t = (d.agent || {}).telephone; if (t) $('#mobTel').href = 'tel:' + String(t).replace(/[^\d+]/g, '');
+};
+window.__maj = (a, d) => { if (a === 'biens') { if (!$('#voile') || $('#voile').hidden) montrer(d); } else if (a === 'avis' && window.__rendreAvis) window.__rendreAvis(d); };
+try {
+montrer(await api('biens'));
 } catch (e) {
 $('#grille').innerHTML = `<div class="vide">Les biens ne peuvent pas être chargés pour le moment. Réessayez dans un instant ou contactez-moi directement.</div>`;
 }
@@ -608,19 +673,19 @@ function lancerQuestionnaire(Q) {
 }
 
 (function () {
-  api('avis').then(d => {
+  const rendreAvis = d => {
     const l = d.avis || [];
     if (!l.length) return;
     const s = document.getElementById('avis');
-    const et = '<span style="color:#d99a2b;letter-spacing:2px">★★★★★</span>';
-    s.innerHTML = '<div class="wrap" style="padding-block:44px"><div class="eyebrow">Avis clients</div><h2 style="margin:.3em 0 .2em">Ils m\'ont confié leur projet</h2>' +
-      '<p class="ref" style="margin:0 0 18px">' + et + ' ' + l.length + ' avis · ventes et achats autour de Dijon</p>' +
-      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px">' + l.map(a =>
-        '<article style="background:var(--papier);border:1px solid var(--trait);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">' + et +
-        '<p style="margin:0;flex:1">' + esc(a.texte) + '</p><div style="border-top:1px solid var(--trait);padding-top:10px"><b>' + esc(a.prenom) + '</b><div class="ref">' + esc(a.projet) + '</div></div></article>').join('') +
-      '</div><p class="ref" style="margin-top:14px">Avis recueillis directement par Simon Parent auprès de ses clients, publiés avec leur accord. Transactions réalisées avant novembre 2026.</p></div>';
+    const et = '<span class="et" aria-label="5 sur 5">★★★★★</span>';
+    s.innerHTML = '<div class="av-w"><div class="av-t"><div><div class="eyebrow">Avis clients</div><h2>Ils m\'ont confié leur projet</h2></div><p class="ref">' + et + ' ' + l.length + ' avis vérifiés</p></div>' +
+      '<div class="av-l" tabindex="0" aria-label="Avis clients">' + l.map(a =>
+        '<article class="av"><p>' + esc(a.texte) + '</p><div class="av-p"><b>' + esc(a.prenom) + '</b> · <span>' + esc(a.projet) + '</span></div></article>').join('') +
+      '</div><p class="ref av-m">Avis recueillis directement auprès de mes clients, publiés avec leur accord. Transactions réalisées avant novembre 2026.</p></div>';
     s.hidden = false;
-  }).catch(() => {});
+  };
+  window.__rendreAvis = rendreAvis;
+  (window.__avisP || api('avis')).then(rendreAvis).catch(() => {});
 })();
 if (window.__Q) api('questionnaireInfo', { q: window.__Q }).then(d => setTimeout(() => lancerQuestionnaire(d.q), 300)).catch(er => setTimeout(() => ouvrir('Lien non valable', '<p>' + esc(er.message) + '</p>'), 300));
 </script>
