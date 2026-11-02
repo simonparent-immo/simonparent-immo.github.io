@@ -185,6 +185,8 @@ footer p{margin:4px 0}
 .av{scroll-snap-align:start;background:var(--papier);border:1px solid var(--trait);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
 .av p{margin:0;flex:1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .av.ouvert p{-webkit-line-clamp:unset;display:block}
+.av{cursor:pointer}.av .plus{font-size:13px;font-weight:600;color:var(--or)}.av.ouvert .plus{display:none}
+.av-l{align-items:start}
 .av-p{font-size:13px;color:var(--gris)}.av-p b{color:var(--encre)}
 .av-m{font-size:12px;margin:8px 0 0}
 .barre-mob{display:none}
@@ -722,11 +724,16 @@ function lancerQuestionnaire(Q) {
     const et = '<span class="et" aria-label="5 sur 5">★★★★★</span>';
     s.innerHTML = '<div class="av-w"><div class="av-t"><div><div class="eyebrow">Avis clients</div><h2>Ils m\'ont confié leur projet</h2></div><p class="ref">' + et + ' ' + l.length + ' avis vérifiés</p></div>' +
       '<div class="av-l" tabindex="0" aria-label="Avis clients">' + l.map(a =>
-        '<article class="av"><p>' + esc(a.texte) + '</p><div class="av-p"><b>' + esc(a.prenom) + '</b> · <span>' + esc(a.projet) + '</span></div></article>').join('') +
+        '<article class="av" tabindex="0" role="button" aria-label="Lire l\'avis de ' + esc(a.prenom) + '"><p>' + esc(a.texte) + '</p>' + (String(a.texte || '').length > 120 ? '<span class="plus">Lire la suite</span>' : '') + '<div class="av-p"><b>' + esc(a.prenom) + '</b> · <span>' + esc(a.projet) + '</span></div></article>').join('') +
       '</div><p class="ref av-m">Avis recueillis directement auprès de mes clients, publiés avec leur accord. Transactions réalisées avant novembre 2026.</p></div>';
     s.hidden = false;
   };
   window.__rendreAvis = rendreAvis;
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('.av');
+    if (!a) return;
+    a.classList.toggle('ouvert');
+  });
   (window.__avisP || api('avis')).then(rendreAvis).catch(() => {});
 })();
 if (window.__Q) api('questionnaireInfo', { q: window.__Q }).then(d => setTimeout(() => lancerQuestionnaire(d.q), 300)).catch(er => setTimeout(() => ouvrir('Lien non valable', '<p>' + esc(er.message) + '</p>'), 300));
