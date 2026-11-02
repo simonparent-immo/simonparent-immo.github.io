@@ -29,7 +29,7 @@
 --err:#b0362c;
 --display:"Cormorant Garamond", Garamond, Georgia, "Times New Roman", serif;
 --texte:"Manrope", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
---mono:ui-monospace, Menlo, Consolas, monospace;
+--mono:var(--texte);--mono-old:ui-monospace, Menlo, Consolas, monospace;
 --r:12px;
 color-scheme:light;
 }
@@ -207,7 +207,6 @@ header.site nav a:not(.cta){display:none}
 .barre-mob .btn{flex:1;justify-content:center;text-align:center}
 body{padding-bottom:76px}
 }
-.peu .filtres{display:none}
 .squelette{background:var(--papier);border:1px solid var(--trait);border-radius:var(--r);overflow:hidden}
 .squelette .sq-i{aspect-ratio:4/3;background:linear-gradient(90deg,var(--trait),var(--pierre),var(--trait));background-size:200% 100%;animation:sq 1.2s infinite linear}
 .squelette .sq-t{height:14px;margin:14px;border-radius:6px;background:var(--trait)}
@@ -226,7 +225,7 @@ body{padding-bottom:76px}
 .ou{text-align:center;font-size:12px;color:var(--gris);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
 .direct{display:grid;grid-template-columns:1fr 1fr;gap:8px}.direct .btn{justify-content:center;font-size:13px;padding-inline:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tete .cta-tete{margin-left:auto}
-.peu .tete .cta-tete{display:inline-flex}
+.peu .tete .cta-tete{display:none}
 .cta-tete{display:none}
 @media (max-width:860px){.hero{grid-template-columns:1fr!important}}
 @media (max-width:700px){.preuves{font-size:14px;margin-top:12px}.carte-rdv{padding:16px}.carte-rdv h2{font-size:24px}.direct{grid-template-columns:1fr}.direct .btn:last-child{display:none}header.site nav{display:none}.preuves{display:none}.hero p{margin-top:10px}}
@@ -238,6 +237,14 @@ body{padding-bottom:76px}
 .bien.est-vendu .prix{color:var(--gris)}
 .grande.photo{position:relative}
 .info-st{background:var(--or-doux);border-radius:10px;padding:10px 12px;font-size:14px}
+
+.mono{font-family:var(--texte)!important;font-variant-numeric:tabular-nums;letter-spacing:0}
+h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;letter-spacing:-.01em}
+#biens .tete h2,.av-t h2,.carte-rdv h2{font-size:clamp(22px,2.6vw,28px)}
+.hero h1{font-variant-numeric:lining-nums}
+.filtres select{min-width:150px}
+.f-info{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-6px 0 14px;font-size:14px;color:var(--gris)}
+.f-info button{background:none;border:0;color:var(--or);font:inherit;font-weight:600;cursor:pointer;padding:0}
 </style>
 </head>
 <body>
@@ -279,11 +286,13 @@ body{padding-bottom:76px}
 <div class="filtres">
 <select id="fType" aria-label="Type de bien"><option value="">Tous les types</option></select>
 <select id="fVille" aria-label="Ville"><option value="">Toutes les villes</option></select>
+<select id="fDispo" aria-label="Disponibilité"><option value="tous">Tous les biens</option><option value="dispo">Disponibles uniquement</option><option value="Vendu">Vendus</option></select>
 <select id="fBudget" aria-label="Budget maximum">
 <option value="">Tous les budgets</option><option>150000</option><option>250000</option><option>350000</option><option>500000</option><option>750000</option>
 </select>
 </div>
 </div>
+<div class="f-info" id="fInfo" hidden><span id="fNb"></span><button id="fRaz" type="button">Effacer les filtres</button></div>
 <div class="grille" id="grille"><div class="squelette"><div class="sq-i"></div><div class="sq-t"></div><div class="sq-t" style="width:60%"></div></div></div>
 </section>
 
@@ -415,7 +424,10 @@ return t.length ? '<div class="tags">' + t.join('') + '</div>' : '';
 function afficherBiens() {
 const t = $('#fType').value, v = $('#fVille').value, m = Number($('#fBudget').value) || Infinity;
 const ordre = b => b.statut === 'Vendu' ? 2 : (b.statut === 'Sous offre' || b.statut === 'Sous compromis') ? 1 : 0;
-const liste = BIENS.filter(b => (!t || b.type === t) && (!v || b.ville === v) && (!b.prix || b.prix <= m)).sort((a, c) => ordre(a) - ordre(c));
+const fs = $('#fDispo') ? $('#fDispo').value : 'tous';
+const liste = BIENS.filter(b => (!t || b.type === t) && (!v || b.ville === v) && (m === Infinity || !b.prix || Number(b.prix) <= m) && (fs === 'dispo' ? b.statut !== 'Vendu' : fs === 'tous' || b.statut === fs)).sort((a, c) => ordre(a) - ordre(c));
+const actif = t || v || m !== Infinity || fs !== 'tous';
+if ($('#fInfo')) { $('#fInfo').hidden = !actif; $('#fNb').textContent = liste.length + ' bien' + (liste.length > 1 ? 's' : '') + ' correspond' + (liste.length > 1 ? 'ent' : '') + ' à votre recherche'; }
 const dispo = BIENS.filter(b => b.statut !== 'Vendu').length;
 $('#titreBiens').textContent = dispo ? `${dispo} bien${dispo > 1 ? 's' : ''} en vente` : 'Mes biens en vente';
 $('#grille').innerHTML = liste.length ? liste.map(b => `
@@ -587,7 +599,8 @@ finally { btn.disabled = false; btn.textContent = 'Envoyer'; }
 $('#ctaRdv').onclick = () => reserver('Visite');
 $('#navRdv').onclick = e => { e.preventDefault(); document.querySelector('.carte-rdv').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
 $('#ctaVisite2').onclick = () => reserver('Visite');
-['#fType', '#fVille', '#fBudget'].forEach(s => $(s).onchange = afficherBiens);
+['#fType', '#fVille', '#fBudget', '#fDispo'].forEach(s => { $(s).onchange = afficherBiens; $(s).oninput = afficherBiens; });
+$('#fRaz').onclick = () => { $('#fType').value = ''; $('#fVille').value = ''; $('#fBudget').value = ''; $('#fDispo').value = 'tous'; afficherBiens(); };
 
 (async function demarrer() {
 $('#bandeauDemo').hidden = !DEMO_MODE;
