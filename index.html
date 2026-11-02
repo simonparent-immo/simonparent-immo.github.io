@@ -210,6 +210,24 @@ body{padding-bottom:76px}
 .squelette .sq-i{aspect-ratio:4/3;background:linear-gradient(90deg,var(--trait),var(--pierre),var(--trait));background-size:200% 100%;animation:sq 1.2s infinite linear}
 .squelette .sq-t{height:14px;margin:14px;border-radius:6px;background:var(--trait)}
 @keyframes sq{to{background-position:-200% 0}}
+
+.hero{grid-template-columns:1.15fr 1fr!important;align-items:center!important;padding-block:20px 32px!important}
+.preuves{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:6px;font-size:15px}
+.preuves li{padding-left:24px;position:relative}
+.preuves li::before{content:"✓";position:absolute;left:0;color:var(--or);font-weight:700}
+.carte-rdv{background:var(--papier);border:1px solid var(--trait);border-radius:16px;padding:22px;display:grid;gap:10px;box-shadow:0 12px 32px rgba(24,34,47,.08)}
+.carte-rdv h2{font-size:28px;margin:0 0 4px}
+.choix{display:grid;gap:2px;text-align:left;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--marine);background:var(--papier);color:var(--encre);font:inherit;cursor:pointer}
+.choix b{font-size:16px}.choix span{font-size:13px;color:var(--gris)}
+.choix.plein{background:var(--or);border-color:var(--or);color:#fff}.choix.plein span{color:rgba(255,255,255,.85)}
+.choix:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(24,34,47,.12)}
+.ou{text-align:center;font-size:12px;color:var(--gris);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.direct{display:grid;grid-template-columns:1fr 1fr;gap:8px}.direct .btn{justify-content:center;font-size:13px;padding-inline:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tete .cta-tete{margin-left:auto}
+.peu .tete .cta-tete{display:inline-flex}
+.cta-tete{display:none}
+@media (max-width:860px){.hero{grid-template-columns:1fr!important}}
+@media (max-width:700px){.preuves{font-size:14px;margin-top:12px}.carte-rdv{padding:16px}.carte-rdv h2{font-size:24px}.direct{grid-template-columns:1fr}.direct .btn:last-child{display:none}header.site nav{display:none}.preuves{display:none}.hero p{margin-top:10px}}
 </style>
 </head>
 <body>
@@ -221,7 +239,7 @@ body{padding-bottom:76px}
 <nav>
 <a href="#biens">Biens à vendre</a>
 <a href="#estimer">Faire estimer</a>
-<a href="#contact" class="cta">Me contacter</a>
+<a href="#" class="cta" id="navRdv">Prendre rendez-vous</a>
 </nav>
 </header>
 
@@ -229,25 +247,25 @@ body{padding-bottom:76px}
 <div>
 <div class="eyebrow">Dijon · Fontaine-lès-Dijon · Talant · Côte-d'Or</div>
 <h1>Vendre ou acheter autour de Dijon, avec <em>un seul interlocuteur</em> du premier appel à l'acte.</h1>
-<p>Consultez mes biens en vente et réservez directement une visite ou une estimation dans mon agenda. Je vous confirme le rendez-vous par email.</p>
-<div class="actions">
-<a class="btn marine" href="#biens">Voir les biens</a>
-<button class="btn plein" id="ctaEstim">Réserver une estimation</button>
+<p>Choisissez un créneau directement dans mon agenda : je vous confirme le rendez-vous par email.</p>
+<div class="demo" id="bandeauDemo" hidden></div>
+<ul class="preuves"><li>Avis de valeur écrit, sans engagement</li><li>Réservation en ligne, confirmation par email</li><li>Conseiller VESTA MB à Fontaine-lès-Dijon</li></ul>
 </div>
-<div class="demo" id="bandeauDemo" hidden>Aperçu de démonstration : les biens et créneaux affichés sont des exemples. Une fois branchée au CRM, la page affiche les biens réels et l'agenda réel.</div>
-</div>
-<aside class="carte-agent" aria-label="Coordonnées">
-<div class="eyebrow">Votre conseiller</div>
-<div class="lig"><span>Téléphone</span><span id="telAgent" class="mono">—</span></div>
-<div class="lig"><span>Email</span><span id="mailAgent">—</span></div>
-<div class="lig"><span>Agence</span><span>VESTA MB<br><span style="font-weight:500;color:var(--gris)" id="adrAgence">84 rue du Faubourg Saint-Martin, 21121 Fontaine-lès-Dijon</span></span></div>
-<button class="btn" id="ctaRdv">Prendre rendez-vous</button>
+<aside class="carte-rdv" aria-label="Prendre rendez-vous">
+<div class="eyebrow">Prendre rendez-vous</div>
+<h2>Quel est votre projet ?</h2>
+<button class="choix plein" id="ctaEstim"><b>Je vends : faire estimer mon bien</b><span>Rendez-vous chez vous · avis de valeur écrit</span></button>
+<button class="choix" id="ctaRdv"><b>J'achète : visiter un bien</b><span>Choisissez le bien puis le créneau</span></button>
+<div class="ou">ou directement</div>
+<div class="direct"><a class="btn" id="lienTel" href="tel:0683706460">Appeler <span id="telAgent" class="mono">06 83 70 64 60</span></a><a class="btn" id="lienMail" href="mailto:simon.parent@vestamb.fr"><span id="mailAgent">simon.parent@vestamb.fr</span></a></div>
 </aside>
 </div>
+
 
 <section id="biens">
 <div class="tete">
 <div><div class="eyebrow">En vente</div><h2 id="titreBiens">Mes biens en vente</h2></div>
+<button class="btn plein cta-tete" id="ctaVisite2">Réserver une visite</button>
 <div class="filtres">
 <select id="fType" aria-label="Type de bien"><option value="">Tous les types</option></select>
 <select id="fVille" aria-label="Ville"><option value="">Toutes les villes</option></select>
@@ -360,8 +378,8 @@ return 'Honoraires à la charge du vendeur.';
 
 function remplirAgent(a) {
 AGENT = a || {};
-if (a.telephone) $('#telAgent').textContent = a.telephone;
-if (a.email) $('#mailAgent').textContent = a.email;
+if (a.telephone) { $('#telAgent').textContent = a.telephone; $('#lienTel').href = 'tel:' + String(a.telephone).replace(/[^\d+]/g, ''); }
+if (a.email) { $('#mailAgent').textContent = a.email; $('#lienMail').href = 'mailto:' + a.email; }
 if (a.adresseAgence) $('#adrAgence').textContent = a.adresseAgence;
 if (a.nom) { $('#nomAgent').textContent = a.nom; $('#fNom').textContent = a.nom; }
 if (a.statut) $('#fStatut').textContent = a.statut;
@@ -543,12 +561,14 @@ finally { btn.disabled = false; btn.textContent = 'Envoyer'; }
 
 ['#ctaEstim', '#ctaEstim2'].forEach(s => $(s).onclick = () => reserver('Estimation'));
 $('#ctaRdv').onclick = () => reserver('Visite');
+$('#navRdv').onclick = e => { e.preventDefault(); document.querySelector('.carte-rdv').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+$('#ctaVisite2').onclick = () => reserver('Visite');
 ['#fType', '#fVille', '#fBudget'].forEach(s => $(s).onchange = afficherBiens);
 
 (async function demarrer() {
 $('#bandeauDemo').hidden = !DEMO_MODE;
 window.__avisP = api('avis');
-$('#mobRdv').onclick = () => reserver('Visite');
+$('#mobRdv').onclick = () => document.querySelector('.carte-rdv').scrollIntoView({ behavior: 'smooth', block: 'center' });
 const montrer = d => {
 BIENS = d.biens || []; remplirAgent(d.agent || {});
 document.getElementById('biens').classList.toggle('peu', BIENS.length < 5);
