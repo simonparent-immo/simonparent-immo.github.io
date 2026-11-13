@@ -48,6 +48,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--or);font-weight:700}
 header.site{padding-block:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .marque{display:flex;flex-direction:column;line-height:1.15}
+.logoVesta{display:block;flex:0 0 auto;line-height:0;padding-right:16px;border-right:1px solid var(--ligne,#d9d6cf)}
+.logoVesta img{width:66px;height:66px;display:block}
 .marque b{font-family:var(--display);font-weight:600;font-size:24px}
 .marque span{font-size:12.5px;color:var(--gris)}
 header.site nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
@@ -196,7 +198,8 @@ footer p{margin:4px 0}
 .hero p{font-size:15px}
 .carte-agent{padding:12px 14px;gap:6px}
 .carte-agent .lig:nth-of-type(4){display:none}
-header.site{padding-block:12px;flex-wrap:nowrap}
+header.site{padding-block:12px;flex-wrap:nowrap;gap:10px}
+.logoVesta{padding-right:10px}.logoVesta img{width:42px;height:42px}
 header.site nav a:not(.cta){display:none}
 .marque span{font-size:12px}
 .hero .eyebrow{font-size:10px}
@@ -264,6 +267,7 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 
 <div class="wrap">
 <header class="site">
+<span class="logoVesta"><img src="logo-vesta-mb.png" alt="VESTA MB Immobilier" width="56" height="56"></span>
 <div class="marque"><b id="nomAgent">Simon Parent</b><span>Conseiller immobilier · VESTA MB</span></div>
 <nav>
 <a href="#biens">Biens à vendre</a>
