@@ -91,6 +91,7 @@ section{padding-block:40px}
 .bien .carac{font-size:14px;color:var(--gris)}
 .bien .ville{font-weight:700}
 .bien .bas{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:8px}
+.dpe-img{display:block;width:100%;max-width:320px;height:auto;margin-top:6px}
 .dpe-mini{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--gris)}
 .dpe-mini b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:5px;color:#fff;font-size:13px}
 .ref{font-size:12px;color:var(--gris)}
@@ -512,8 +513,8 @@ ${b.statut === 'Vendu' ? `<div class="info-st">Ce bien a été vendu. Vous cherc
 </div>`}
 ${b.description ? `<div class="texte">${esc(b.description)}</div>` : ''}
 <div class="duo" style="gap:16px">
-${b.dpe && DPE_COUL[b.dpe] ? echelle(b.dpe, DPE_COUL, 'Consommation énergétique (DPE)') : `<div><div class="eyebrow">DPE</div><p class="ref">${esc(b.dpe || 'Non communiqué')}</p></div>`}
-${b.ges && GES_COUL[b.ges] ? echelle(b.ges, GES_COUL, 'Émissions de gaz à effet de serre') : ''}
+${b.dpe && DPE_COUL[b.dpe] ? echelle(b.dpe, DPE_COUL, 'Consommation énergétique (DPE)') : b.dpeImg ? `<div><div class="eyebrow">Consommation énergétique (DPE)</div><img class="dpe-img" src="${esc(b.dpeImg)}" alt="Étiquette DPE" loading="lazy"></div>` : `<div><div class="eyebrow">DPE</div><p class="ref">${esc(b.dpe || 'Non communiqué')}</p></div>`}
+${b.ges && GES_COUL[b.ges] ? echelle(b.ges, GES_COUL, 'Émissions de gaz à effet de serre') : b.gesImg ? `<div><div class="eyebrow">Émissions de gaz à effet de serre (GES)</div><img class="dpe-img" src="${esc(b.gesImg)}" alt="Étiquette GES" loading="lazy"></div>` : ''}
 </div>
 <div class="mentions">${b.reference ? 'Référence ' + esc(b.reference) + '. ' : ''}Bien proposé par ${esc(AGENT.nom || 'Simon Parent')}, ${esc((AGENT.statut || 'agent commercial').toLowerCase())}${AGENT.rsac ? ', RSAC ' + esc(AGENT.rsac) : ''}, pour l'agence VESTA MB. Les informations sur les risques auxquels ce bien est exposé sont disponibles sur georisques.gouv.fr.</div>`);
 document.querySelectorAll('.vignettes button').forEach(btn => btn.onclick = () => {
