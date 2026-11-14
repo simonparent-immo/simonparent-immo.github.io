@@ -281,15 +281,15 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <div>
 <div class="eyebrow">Dijon · Fontaine-lès-Dijon · Talant · Côte-d'Or</div>
 <h1>Vendre ou acheter autour de Dijon, avec <em>un seul interlocuteur</em> du premier appel à l'acte.</h1>
-<p>Choisissez un créneau directement dans mon agenda : je vous confirme le rendez-vous par email.</p>
+<p>Vous vendez : choisissez un créneau d'estimation dans mon agenda. Un bien vous intéresse : laissez-moi vos coordonnées, je vous rappelle pour en parler et organiser la visite.</p>
 <div class="demo" id="bandeauDemo" hidden></div>
-<ul class="preuves"><li>Avis de valeur écrit, sans engagement</li><li>Réservation en ligne, confirmation par email</li><li>Conseiller VESTA MB à Fontaine-lès-Dijon</li></ul>
+<ul class="preuves"><li>Avis de valeur écrit, sans engagement</li><li>Un échange avant chaque visite, pour ne visiter que les biens qui vous correspondent</li><li>Conseiller VESTA MB à Fontaine-lès-Dijon</li></ul>
 </div>
 <aside class="carte-rdv" aria-label="Prendre rendez-vous">
 <div class="eyebrow">Prendre rendez-vous</div>
 <h2>Quel est votre projet ?</h2>
 <button class="choix plein" id="ctaEstim"><b>Je vends : faire estimer mon bien</b><span>Rendez-vous chez vous · avis de valeur écrit</span></button>
-<button class="choix" id="ctaRdv"><b>J'achète : visiter un bien</b><span>Choisissez le bien puis le créneau</span></button>
+<button class="choix" id="ctaRdv"><b>J'achète : un bien m'intéresse</b><span>Je vous rappelle pour en parler, puis on fixe la visite</span></button>
 <div class="ou">ou directement</div>
 <div class="direct"><a class="btn" id="lienTel" href="tel:0683706460">Appeler <span id="telAgent" class="mono">06 83 70 64 60</span></a><a class="btn" id="lienMail" href="mailto:simon.parent@vestamb.fr"><span id="mailAgent">simon.parent@vestamb.fr</span></a></div>
 </aside>
@@ -299,7 +299,7 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <section id="biens">
 <div class="tete">
 <div><div class="eyebrow">En vente</div><h2 id="titreBiens">Mes biens en vente</h2></div>
-<button class="btn plein cta-tete" id="ctaVisite2">Réserver une visite</button>
+<button class="btn plein cta-tete" id="ctaVisite2">Être rappelé pour un bien</button>
 <div class="filtres">
 <select id="fType" aria-label="Type de bien"><option value="">Tous les types</option></select>
 <select id="fVille" aria-label="Ville"><option value="">Toutes les villes</option></select>
@@ -506,10 +506,10 @@ ${photos.length > 1 ? `<div class="vignettes">${photos.map((p, i) => `<button da
 <div><span>Terrain</span><b class="mono">${b.terrain ? esc(b.terrain) + ' m²' : '—'}</b></div>
 </div>
 ${b.statut === 'Vendu' ? `<div class="info-st">Ce bien a été vendu. Vous cherchez un bien similaire ou souhaitez connaître la valeur du vôtre ?</div>
-<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn plein" id="bEstimV">Faire estimer mon bien</button><button class="btn" id="bQuestion">Décrire ma recherche</button></div>` : `${b.statut === 'Sous offre' || b.statut === 'Sous compromis' ? `<div class="info-st">Ce bien est ${b.statut === 'Sous offre' ? 'sous offre' : 'sous compromis'}. Vous pouvez encore le visiter ou me laisser vos coordonnées en cas de désistement.</div>` : ''}
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn plein" id="bEstimV">Faire estimer mon bien</button><button class="btn" id="bQuestion">Décrire ma recherche</button></div>` : `${b.statut === 'Sous offre' || b.statut === 'Sous compromis' ? `<div class="info-st">Ce bien est ${b.statut === 'Sous offre' ? 'sous offre' : 'sous compromis'}. Contactez-moi pour en parler ou pour être prévenu en cas de désistement.</div>` : ''}
 <div style="display:flex;gap:10px;flex-wrap:wrap">
-<button class="btn plein" id="bVisite">Réserver une visite</button>
-<button class="btn" id="bQuestion">Poser une question</button>
+<button class="btn plein" id="bVisite">Ce bien m'intéresse : être rappelé</button>
+<a class="btn" id="bAppel" href="tel:0683706460">Appeler Simon</a>
 </div>`}
 ${b.description ? `<div class="texte">${esc(b.description)}</div>` : ''}
 <div class="duo" style="gap:16px">
@@ -521,19 +521,27 @@ document.querySelectorAll('.vignettes button').forEach(btn => btn.onclick = () =
 $('#gGrande').innerHTML = `<img src="${esc(photos[btn.dataset.i])}" alt="">`;
 document.querySelectorAll('.vignettes button').forEach(x => x.classList.toggle('on', x === btn));
 });
-if ($('#bVisite')) $('#bVisite').onclick = () => reserver('Visite', b);
+if ($('#bVisite')) $('#bVisite').onclick = () => demanderRappel(b);
 if ($('#bEstimV')) $('#bEstimV').onclick = () => reserver('Estimation');
-$('#bQuestion').onclick = () => { fermer(); $('#cMsg').value = `Bonjour, je suis intéressé(e) par le bien ${b.reference ? 'réf. ' + b.reference : ''} (${b.type} à ${b.ville}, ${euro(b.prix)}). `; $('#formContact').dataset.bien = b.id; $('#cProfil').value = 'Prospect acquéreur'; if (typeof majProjet === 'function') majProjet(); $('#contact').scrollIntoView({ behavior: 'smooth' }); $('#cPrenom').focus(); };
+if ($('#bQuestion')) $('#bQuestion').onclick = () => { fermer(); $('#cMsg').value = `Bonjour, je suis intéressé(e) par le bien ${b.reference ? 'réf. ' + b.reference : ''} (${b.type} à ${b.ville}, ${euro(b.prix)}). `; $('#formContact').dataset.bien = b.id; $('#cProfil').value = 'Prospect acquéreur'; if (typeof majProjet === 'function') majProjet(); $('#contact').scrollIntoView({ behavior: 'smooth' }); $('#cPrenom').focus(); };
 }
 
 // ─── Réservation en 3 étapes
+function demanderRappel(b) {
+if (typeof fermer === 'function') fermer();
+$('#cProfil').value = 'Prospect acquéreur'; if (typeof majProjet === 'function') majProjet();
+$('#cMsg').value = b ? `Bonjour, le bien ${b.reference ? 'réf. ' + b.reference + ' ' : ''}(${b.type} à ${b.ville}${b.prix ? ', ' + euro(b.prix) : ''}) m'intéresse. Pouvez-vous me rappeler pour en parler et organiser une visite ? Mes disponibilités : ` : "Bonjour, je cherche un bien et j'aimerais en parler avec vous. Mes disponibilités pour un appel : ";
+if (b) $('#formContact').dataset.bien = b.id; else delete $('#formContact').dataset.bien;
+$('#contact').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#cPrenom').focus(), 400);
+}
 async function reserver(typeInitial, bien) {
+if (typeInitial === 'Visite') return demanderRappel(bien);
 const st = { type: typeInitial, date: '', heure: '', bien };
 ouvrir(bien ? 'Réserver une visite' : 'Prendre rendez-vous', `
 <div class="etapes"><span class="on" id="e1">1. Créneau</span><span id="e2">2. Coordonnées</span><span id="e3">3. Confirmation</span></div>
 ${bien ? `<div class="recap"><b>${esc(bien.titre || bien.type)}</b><br><span class="ref">${esc([bien.ville, euro(bien.prix)].filter(Boolean).join(' · '))}</span></div>` : ''}
 <div id="zone"></div>`);
-if (!TYPES.length) { try { TYPES = (await api('types')).types; } catch (e) { TYPES = []; } }
+if (!TYPES.length) { try { TYPES = (await api('types')).types.filter(t => t.type !== 'Visite'); } catch (e) { TYPES = []; } }
 
 const etape1 = async () => {
 ['e1', 'e2', 'e3'].forEach((k, i) => $('#' + k).classList.toggle('on', i === 0));
@@ -613,7 +621,7 @@ etape1();
 $('#formContact').onsubmit = async e => {
 e.preventDefault();
 const v = id => $('#' + id).value.trim(), retour = $('#cRetour');
-const erreur = !v('cNom') ? 'Indiquez votre nom.' : !v('cProfil') ? 'Indiquez votre projet.' : (!v('cEmail') && !v('cTel')) ? 'Indiquez un email ou un téléphone pour que je puisse vous répondre.' : !$('#cRgpd').checked ? 'Cochez la case pour accepter le traitement de vos coordonnées.' : '';
+const erreur = !v('cNom') ? 'Indiquez votre nom.' : !v('cProfil') ? 'Indiquez votre projet.' : (!v('cEmail') && !v('cTel')) ? 'Indiquez un email ou un téléphone pour que je puisse vous répondre.' : ($('#formContact').dataset.bien && !v('cTel')) ? 'Indiquez votre téléphone pour que je puisse vous rappeler au sujet du bien.' : !$('#cRgpd').checked ? 'Cochez la case pour accepter le traitement de vos coordonnées.' : '';
 if (erreur) { retour.hidden = false; retour.className = 'msg err'; retour.textContent = erreur; return; }
 const btn = $('#cEnvoyer'); btn.disabled = true;
 const num = id => v(id).replace(/[^\d,.]/g, '').replace(',', '.');
@@ -633,9 +641,9 @@ $('#cProfil').onchange = majProjet; majProjet();
 ['aBudget', 'vPrix'].forEach(id => $('#' + id).addEventListener('input', ev => { const d = ev.target.value.replace(/\D/g, ''); ev.target.value = d ? Number(d).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0') : ''; }));
 
 ['#ctaEstim', '#ctaEstim2'].forEach(s => $(s).onclick = () => reserver('Estimation'));
-$('#ctaRdv').onclick = () => reserver('Visite');
+$('#ctaRdv').onclick = () => demanderRappel();
 $('#navRdv').onclick = e => { e.preventDefault(); document.querySelector('.carte-rdv').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
-$('#ctaVisite2').onclick = () => reserver('Visite');
+$('#ctaVisite2').onclick = () => demanderRappel();
 ['#fType', '#fVille', '#fBudget'].forEach(s => { $(s).onchange = afficherBiens; $(s).oninput = afficherBiens; });
 $('#fRaz').onclick = () => { $('#fType').value = ''; $('#fVille').value = ''; $('#fBudget').value = ''; afficherBiens(); };
 
