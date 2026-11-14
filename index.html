@@ -280,7 +280,7 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <nav>
 <a href="#biens">Biens à vendre</a>
 <a href="#estimer">Faire estimer</a>
-<a href="#" class="cta" id="navRdv">Prendre rendez-vous</a>
+<a href="#" class="cta" id="navRdv">Être rappelé</a>
 </nav>
 </header>
 
@@ -288,14 +288,14 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <div>
 <div class="eyebrow">Dijon · Fontaine-lès-Dijon · Talant · Côte-d'Or</div>
 <h1>Vendre ou acheter autour de Dijon, avec <em>un seul interlocuteur</em> du premier appel à l'acte.</h1>
-<p>Vous vendez : choisissez un créneau d'estimation dans mon agenda. Un bien vous intéresse : laissez-moi vos coordonnées, je vous rappelle pour en parler et organiser la visite.</p>
+<p>Que vous vendiez ou que vous achetiez, laissez-moi vos coordonnées : je vous rappelle pour faire le point sur votre projet, puis on fixe ensemble le rendez-vous.</p>
 <div class="demo" id="bandeauDemo" hidden></div>
-<ul class="preuves"><li>Avis de valeur écrit, sans engagement</li><li>Un échange avant chaque visite, pour ne visiter que les biens qui vous correspondent</li><li>Conseiller VESTA MB à Fontaine-lès-Dijon</li></ul>
+<ul class="preuves"><li>Avis de valeur écrit, sans engagement</li><li>Un premier échange téléphonique avant tout rendez-vous</li><li>Conseiller VESTA MB à Fontaine-lès-Dijon</li></ul>
 </div>
 <aside class="carte-rdv" aria-label="Prendre rendez-vous">
-<div class="eyebrow">Prendre rendez-vous</div>
+<div class="eyebrow">Parlons de votre projet</div>
 <h2>Quel est votre projet ?</h2>
-<button class="choix plein" id="ctaEstim"><b>Je vends : faire estimer mon bien</b><span>Rendez-vous chez vous · avis de valeur écrit</span></button>
+<button class="choix plein" id="ctaEstim"><b>Je vends : faire estimer mon bien</b><span>Je vous rappelle, puis je viens chez vous · avis de valeur écrit</span></button>
 <button class="choix" id="ctaRdv"><b>J'achète : trouver mon bien</b><span>Vos critères, les biens qui correspondent, puis on en parle</span></button>
 <div class="ou">ou directement</div>
 <div class="direct"><a class="btn" id="lienTel" href="tel:0683706460">Appeler <span id="telAgent" class="mono">06 83 70 64 60</span></a><a class="btn" id="lienMail" href="mailto:simon.parent@vestamb.fr"><span id="mailAgent">simon.parent@vestamb.fr</span></a></div>
@@ -325,8 +325,8 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <div class="bloc">
 <div class="eyebrow">Propriétaires</div>
 <h3>Combien vaut votre bien ?</h3>
-<p>Je viens voir votre bien, j'analyse les ventes récentes du quartier et je vous remets un avis de valeur écrit, sans engagement.</p>
-<div><button class="btn plein" id="ctaEstim2">Choisir un créneau d'estimation</button></div>
+<p>On échange d'abord par téléphone, puis je viens voir votre bien, j'analyse les ventes récentes du quartier et je vous remets un avis de valeur écrit, sans engagement.</p>
+<div><button class="btn plein" id="ctaEstim2">Être rappelé pour une estimation</button></div>
 </div>
 <div class="bloc sombre" id="contact">
 <div class="eyebrow">Une question ?</div>
@@ -367,7 +367,7 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 </section>
 </div>
 
-<div class="barre-mob"><a class="btn marine" id="mobTel" href="tel:0683706460">Appeler</a><button class="btn plein" id="mobRdv">Rendez-vous</button></div>
+<div class="barre-mob"><a class="btn marine" id="mobTel" href="tel:0683706460">Appeler</a><button class="btn plein" id="mobRdv">Être rappelé</button></div>
 <footer>
 <div class="wrap cols">
 <div><b id="fNom">Simon Parent</b><p id="fStatut">Agent commercial en immobilier (entreprise individuelle)</p><p id="fRsac"></p></div>
@@ -583,15 +583,23 @@ delete $('#formContact').dataset.bien;
 $('#contact').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#cPrenom').focus(), 400);
 };
 }
+function demanderEstimation() {
+if (typeof fermer === 'function') fermer();
+$('#cProfil').value = 'Prospect vendeur'; if (typeof majProjet === 'function') majProjet();
+$('#cMsg').value = "Bonjour, je souhaite faire estimer mon bien. Pouvez-vous me rappeler ? Mes disponibilités pour un appel : ";
+delete $('#formContact').dataset.bien; $('#formContact').dataset.rappel = '1';
+$('#contact').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#cPrenom').focus(), 400);
+}
 function demanderRappel(b) {
 if (typeof fermer === 'function') fermer();
 $('#cProfil').value = 'Prospect acquéreur'; if (typeof majProjet === 'function') majProjet();
 $('#cMsg').value = b ? `Bonjour, le bien ${b.reference ? 'réf. ' + b.reference + ' ' : ''}(${b.type} à ${b.ville}${b.prix ? ', ' + euro(b.prix) : ''}) m'intéresse. Pouvez-vous me rappeler pour en parler et organiser une visite ? Mes disponibilités : ` : "Bonjour, je cherche un bien et j'aimerais en parler avec vous. Mes disponibilités pour un appel : ";
-if (b) $('#formContact').dataset.bien = b.id; else delete $('#formContact').dataset.bien;
+if (b) $('#formContact').dataset.bien = b.id; else delete $('#formContact').dataset.bien; $('#formContact').dataset.rappel = '1';
 $('#contact').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#cPrenom').focus(), 400);
 }
 async function reserver(typeInitial, bien) {
-if (typeInitial === 'Visite') return demanderRappel(bien);
+if (typeInitial === 'Estimation') return demanderEstimation();
+return demanderRappel(bien);
 const st = { type: typeInitial, date: '', heure: '', bien };
 ouvrir(bien ? 'Réserver une visite' : 'Prendre rendez-vous', `
 <div class="etapes"><span class="on" id="e1">1. Créneau</span><span id="e2">2. Coordonnées</span><span id="e3">3. Confirmation</span></div>
@@ -677,7 +685,7 @@ etape1();
 $('#formContact').onsubmit = async e => {
 e.preventDefault();
 const v = id => $('#' + id).value.trim(), retour = $('#cRetour');
-const erreur = !v('cNom') ? 'Indiquez votre nom.' : !v('cProfil') ? 'Indiquez votre projet.' : (!v('cEmail') && !v('cTel')) ? 'Indiquez un email ou un téléphone pour que je puisse vous répondre.' : ($('#formContact').dataset.bien && !v('cTel')) ? 'Indiquez votre téléphone pour que je puisse vous rappeler au sujet du bien.' : !$('#cRgpd').checked ? 'Cochez la case pour accepter le traitement de vos coordonnées.' : '';
+const erreur = !v('cNom') ? 'Indiquez votre nom.' : !v('cProfil') ? 'Indiquez votre projet.' : (!v('cEmail') && !v('cTel')) ? 'Indiquez un email ou un téléphone pour que je puisse vous répondre.' : (($('#formContact').dataset.bien || $('#formContact').dataset.rappel) && !v('cTel')) ? 'Indiquez votre téléphone pour que je puisse vous rappeler.' : !$('#cRgpd').checked ? 'Cochez la case pour accepter le traitement de vos coordonnées.' : '';
 if (erreur) { retour.hidden = false; retour.className = 'msg err'; retour.textContent = erreur; return; }
 const btn = $('#cEnvoyer'); btn.disabled = true;
 const num = id => v(id).replace(/[^\d,.]/g, '').replace(',', '.');
