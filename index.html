@@ -222,6 +222,13 @@ body{padding-bottom:76px}
 .preuves li::before{content:"✓";position:absolute;left:0;color:var(--or);font-weight:700}
 .carte-rdv{background:var(--papier);border:1px solid var(--trait);border-radius:16px;padding:22px;display:grid;gap:10px;box-shadow:0 12px 32px rgba(24,34,47,.08)}
 .carte-rdv h2{font-size:28px;margin:0 0 4px}
+.r-puces{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.r-puces button{font:inherit;font-size:14px;font-weight:600;padding:9px 14px;border-radius:999px;border:1px solid var(--trait);background:var(--papier);color:var(--encre);cursor:pointer}
+.r-puces button.on{background:var(--marine);border-color:var(--marine);color:#fff}
+#rVoir:disabled{opacity:.5;cursor:default}
+.r-alerte{font-size:14px;color:var(--gris);margin:14px 0 0;line-height:1.5}
+.r-alerte.fort{color:var(--encre);background:var(--papier);border:1px solid var(--trait);border-radius:12px;padding:12px 14px}
+.lien{font:inherit;font-weight:700;color:var(--or,#a8822f);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
 .choix{display:grid;gap:2px;text-align:left;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--marine);background:var(--papier);color:var(--encre);font:inherit;cursor:pointer}
 .choix b{font-size:16px}.choix span{font-size:13px;color:var(--gris)}
 .choix.plein{background:var(--or);border-color:var(--or);color:#fff}.choix.plein span{color:rgba(255,255,255,.85)}
@@ -289,7 +296,7 @@ h2,h3,.bloc h3{font-family:var(--texte)!important;font-weight:700!important;lett
 <div class="eyebrow">Prendre rendez-vous</div>
 <h2>Quel est votre projet ?</h2>
 <button class="choix plein" id="ctaEstim"><b>Je vends : faire estimer mon bien</b><span>Rendez-vous chez vous · avis de valeur écrit</span></button>
-<button class="choix" id="ctaRdv"><b>J'achète : un bien m'intéresse</b><span>Je vous rappelle pour en parler, puis on fixe la visite</span></button>
+<button class="choix" id="ctaRdv"><b>J'achète : trouver mon bien</b><span>Vos critères, les biens qui correspondent, puis on en parle</span></button>
 <div class="ou">ou directement</div>
 <div class="direct"><a class="btn" id="lienTel" href="tel:0683706460">Appeler <span id="telAgent" class="mono">06 83 70 64 60</span></a><a class="btn" id="lienMail" href="mailto:simon.parent@vestamb.fr"><span id="mailAgent">simon.parent@vestamb.fr</span></a></div>
 </aside>
@@ -451,12 +458,15 @@ else if (b.statut === 'Sous offre') t.push('<span class="tag st-o">Sous offre</s
 if (/exclusif/i.test(b.mandat || '') && b.statut !== 'Vendu') t.push('<span class="tag st-x">Exclusivité</span>');
 return t.length ? '<div class="tags">' + t.join('') + '</div>' : '';
 }
+const CRIT = { budget: 0, surf: 0, pieces: 0 };
+const nombre = x => Number(String(x == null ? '' : x).replace(/\s/g, '').replace(',', '.')) || 0;
+function critOk(b) { return (!CRIT.surf || nombre(b.surface) >= CRIT.surf) && (!CRIT.pieces || nombre(b.pieces) >= CRIT.pieces); }
 function afficherBiens() {
-const t = $('#fType').value, v = $('#fVille').value, m = Number($('#fBudget').value) || Infinity;
+const t = $('#fType').value, v = $('#fVille').value, m = CRIT.budget || Number($('#fBudget').value) || Infinity;
 const ordre = b => (b.perso === false ? 10 : 0) + (b.statut === 'Sous offre' ? 1 : 0);
 const fs = 'tous';
-const liste = BIENS.filter(b => (!t || b.type === t) && (!v || b.ville === v) && (m === Infinity || !b.prix || Number(b.prix) <= m) && ['Vendu', 'Sous compromis', 'Retiré'].indexOf(b.statut) < 0).sort((a, c) => ordre(a) - ordre(c));
-const actif = t || v || m !== Infinity;
+const liste = BIENS.filter(b => (!t || b.type === t) && (!v || b.ville === v) && (m === Infinity || !b.prix || Number(b.prix) <= m) && critOk(b) && ['Vendu', 'Sous compromis', 'Retiré'].indexOf(b.statut) < 0).sort((a, c) => ordre(a) - ordre(c));
+const actif = t || v || m !== Infinity || CRIT.surf || CRIT.pieces;
 if ($('#fInfo')) { $('#fInfo').hidden = !actif; $('#fNb').textContent = liste.length + ' bien' + (liste.length > 1 ? 's' : '') + ' correspond' + (liste.length > 1 ? 'ent' : '') + ' à votre recherche'; }
 const dispo = BIENS.filter(b => ['Vendu', 'Sous compromis', 'Retiré'].indexOf(b.statut) < 0).length;
 $('#titreBiens').textContent = dispo ? `${dispo} bien${dispo > 1 ? 's' : ''} en vente` : 'Mes biens en vente';
@@ -527,6 +537,52 @@ if ($('#bQuestion')) $('#bQuestion').onclick = () => { fermer(); $('#cMsg').valu
 }
 
 // ─── Réservation en 3 étapes
+function chercher() {
+const dispo = BIENS.filter(b => ['Vendu', 'Sous compromis', 'Retiré'].indexOf(b.statut) < 0);
+const types = [...new Set(dispo.map(b => b.type).filter(Boolean))].sort();
+const villes = [...new Set(dispo.map(b => b.ville).filter(Boolean))].sort((a, c) => a.localeCompare(c, 'fr'));
+const st = { type: $('#fType').value, ville: $('#fVille').value, budget: CRIT.budget || nombre($('#fBudget').value), surf: CRIT.surf, pieces: CRIT.pieces };
+ouvrir('Que recherchez-vous ?', `
+<p class="ref" style="margin:0 0 14px">Indiquez vos critères : je vous montre les biens qui correspondent. Un bien vous plaît ? Je vous rappelle pour en parler avant d'organiser la visite.</p>
+<div class="eyebrow">Type de bien</div>
+<div class="r-puces" id="rType"><button type="button" data-v="">Tous</button>${types.map(t => `<button type="button" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+<label class="f" for="rVille" style="margin-top:14px">Ville<select id="rVille"><option value="">Toutes les villes</option>${villes.map(v => `<option>${esc(v)}</option>`).join('')}</select></label>
+<div class="deux" style="margin-top:12px">
+<label class="f" for="rBudget">Budget maximum (€)<input id="rBudget" inputmode="numeric" placeholder="Ex. : 250 000"></label>
+<label class="f" for="rSurf">Surface minimum (m²)<input id="rSurf" inputmode="numeric" placeholder="Ex. : 60"></label>
+</div>
+<div class="eyebrow" style="margin-top:14px">Nombre de pièces</div>
+<div class="r-puces" id="rPieces">${[['', 'Indifférent'], [1, '1+'], [2, '2+'], [3, '3+'], [4, '4+'], [5, '5+']].map(x => `<button type="button" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>
+<button class="btn plein" id="rVoir" style="width:100%;margin-top:20px">Voir les biens</button>
+<p class="r-alerte">Rien ne correspond ? <button type="button" class="lien" id="rAlerte">Confiez-moi votre recherche</button> : je vous préviens dès qu'un bien correspond.</p>`);
+const fmt = n => n ? Number(n).toLocaleString('fr-FR').replace(/ /g, ' ') : '';
+$('#rVille').value = st.ville; $('#rBudget').value = fmt(st.budget); $('#rSurf').value = st.surf || '';
+const puces = (id, k) => { const el = $('#' + id); el.querySelectorAll('button').forEach(bt => { bt.classList.toggle('on', String(st[k] || '') === bt.dataset.v); bt.onclick = () => { st[k] = k === 'pieces' ? Number(bt.dataset.v) || 0 : bt.dataset.v; puces(id, k); maj(); }; }); };
+const compte = () => dispo.filter(b => (!st.type || b.type === st.type) && (!st.ville || b.ville === st.ville) && (!st.budget || !b.prix || Number(b.prix) <= st.budget) && (!st.surf || nombre(b.surface) >= st.surf) && (!st.pieces || nombre(b.pieces) >= st.pieces)).length;
+const maj = () => { const n = compte(); $('#rVoir').textContent = n ? `Voir ${n === 1 ? 'le bien' : 'les ' + n + ' biens'}` : 'Aucun bien pour ces critères'; $('#rVoir').disabled = !n; $('#rAlerte').parentNode.classList.toggle('fort', !n); };
+puces('rType', 'type'); puces('rPieces', 'pieces');
+$('#rVille').onchange = () => { st.ville = $('#rVille').value; maj(); };
+$('#rBudget').oninput = ev => { const d = ev.target.value.replace(/\D/g, ''); ev.target.value = fmt(d); st.budget = Number(d) || 0; maj(); };
+$('#rSurf').oninput = ev => { const d = ev.target.value.replace(/\D/g, ''); ev.target.value = d; st.surf = Number(d) || 0; maj(); };
+maj();
+$('#rVoir').onclick = () => {
+if (st.type && ![...$('#fType').options].some(o => o.value === st.type)) $('#fType').add(new Option(st.type, st.type));
+if (st.ville && ![...$('#fVille').options].some(o => o.value === st.ville)) $('#fVille').add(new Option(st.ville, st.ville));
+$('#fType').value = st.type; $('#fVille').value = st.ville; $('#fBudget').value = '';
+CRIT.budget = st.budget; CRIT.surf = st.surf; CRIT.pieces = st.pieces;
+fermer(); afficherBiens(); $('#biens').scrollIntoView({ behavior: 'smooth' });
+};
+$('#rAlerte').onclick = () => {
+fermer();
+$('#cProfil').value = 'Prospect acquéreur'; if (typeof majProjet === 'function') majProjet();
+if ($('#aType') && [...$('#aType').options].some(o => o.text === st.type)) $('#aType').value = st.type;
+if ($('#aVille') && st.ville) $('#aVille').value = st.ville;
+if ($('#aBudget') && st.budget) $('#aBudget').value = fmt(st.budget);
+$('#cMsg').value = 'Bonjour, je recherche ' + [({ Maison: 'une maison', Appartement: 'un appartement', Terrain: 'un terrain', Immeuble: 'un immeuble', 'Local commercial': 'un local commercial' })[st.type] || 'un bien', st.ville ? 'à ' + st.ville : '', st.surf ? 'de ' + st.surf + ' m² minimum' : '', st.pieces ? st.pieces + ' pièces ou plus' : '', st.budget ? 'budget ' + fmt(st.budget) + ' € maximum' : ''].filter(Boolean).join(', ') + '. Pouvez-vous me prévenir dès qu\'un bien correspond ?';
+delete $('#formContact').dataset.bien;
+$('#contact').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#cPrenom').focus(), 400);
+};
+}
 function demanderRappel(b) {
 if (typeof fermer === 'function') fermer();
 $('#cProfil').value = 'Prospect acquéreur'; if (typeof majProjet === 'function') majProjet();
@@ -641,11 +697,11 @@ $('#cProfil').onchange = majProjet; majProjet();
 ['aBudget', 'vPrix'].forEach(id => $('#' + id).addEventListener('input', ev => { const d = ev.target.value.replace(/\D/g, ''); ev.target.value = d ? Number(d).toLocaleString('fr-FR').replace(/\u202f/g, '\u00a0') : ''; }));
 
 ['#ctaEstim', '#ctaEstim2'].forEach(s => $(s).onclick = () => reserver('Estimation'));
-$('#ctaRdv').onclick = () => demanderRappel();
+$('#ctaRdv').onclick = () => chercher();
 $('#navRdv').onclick = e => { e.preventDefault(); document.querySelector('.carte-rdv').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
 $('#ctaVisite2').onclick = () => demanderRappel();
 ['#fType', '#fVille', '#fBudget'].forEach(s => { $(s).onchange = afficherBiens; $(s).oninput = afficherBiens; });
-$('#fRaz').onclick = () => { $('#fType').value = ''; $('#fVille').value = ''; $('#fBudget').value = ''; afficherBiens(); };
+$('#fRaz').onclick = () => { CRIT.budget = 0; CRIT.surf = 0; CRIT.pieces = 0; $('#fType').value = ''; $('#fVille').value = ''; $('#fBudget').value = ''; afficherBiens(); };
 
 (async function demarrer() {
 $('#bandeauDemo').hidden = !DEMO_MODE;
