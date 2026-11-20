@@ -84,6 +84,12 @@ section{padding-block:40px}
 .photo img{width:100%;height:100%;object-fit:cover;display:block}
 .photo .ph{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(160deg,var(--or-doux),var(--pierre))}
 .photo .ph svg{width:38%;color:var(--or);opacity:.55}
+.photo .fl{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--encre);display:grid;place-items:center;font-size:26px;line-height:1;padding-bottom:3px;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer;opacity:0;transition:opacity .15s;z-index:2;user-select:none}
+.photo .fl.g{left:10px}.photo .fl.d{right:10px}
+.bien:hover .photo .fl,.photo .fl:focus-visible{opacity:1}
+.photo .fl:hover{background:#fff}
+.photo .cpt{position:absolute;right:10px;bottom:10px;background:rgba(20,30,45,.65);color:#fff;font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;z-index:2}
+@media (hover:none){.photo .fl{opacity:.9;width:34px;height:34px;font-size:22px}}
 .photo .tag{position:absolute;left:12px;top:12px;background:var(--marine);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
 .photo .tag.ex{background:var(--or)}
 .bien .corps{padding:14px 16px 16px;display:grid;gap:6px;flex:1}
@@ -480,7 +486,27 @@ $('#grille').innerHTML = liste.length ? liste.map(b => `
 <div class="bas">${b.dpe && DPE_COUL[b.dpe] ? `<span class="dpe-mini">DPE <b style="background:${DPE_COUL[b.dpe]}">${esc(b.dpe)}</b></span>` : '<span></span>'}<span class="ref mono">${b.reference ? 'Réf. ' + esc(b.reference) : ''}</span></div>
 </div>
 </button>`).join('') : `<div class="vide">${BIENS.length ? 'Aucun bien ne correspond à ces critères.' : "Aucun bien en ligne pour l'instant. Écrivez-moi votre recherche, je vous préviens dès qu'un bien correspond."}</div>`;
-document.querySelectorAll('.bien').forEach(el => el.onclick = () => ouvrirBien(el.dataset.id));
+document.querySelectorAll('.bien').forEach(el => { el.onclick = () => ouvrirBien(el.dataset.id); defilement(el, liste.find(x => String(x.id) === el.dataset.id)); });
+}
+// Défilement des photos sur la carte (flèches + glisser du doigt), sans ouvrir l'annonce
+function defilement(el, b) {
+const ph = b && (b.photos || []).filter(Boolean);
+if (!ph || ph.length < 2) return;
+const box = el.querySelector('.photo'), img = box.querySelector('img');
+if (!img) return;
+let i = 0;
+box.insertAdjacentHTML('beforeend', `<span class="fl g" role="button" tabindex="0" aria-label="Photo précédente">‹</span><span class="fl d" role="button" tabindex="0" aria-label="Photo suivante">›</span><span class="cpt">1 / ${ph.length}</span>`);
+const cpt = box.querySelector('.cpt');
+const aller = k => { i = (i + k + ph.length) % ph.length; img.src = taille(ph[i], 800); cpt.textContent = (i + 1) + ' / ' + ph.length; const n = new Image(); n.src = taille(ph[(i + 1) % ph.length], 800); };
+box.querySelectorAll('.fl').forEach(f => {
+const k = f.classList.contains('g') ? -1 : 1;
+f.onclick = e => { e.stopPropagation(); e.preventDefault(); aller(k); };
+f.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); e.preventDefault(); aller(k); } };
+});
+let x0 = null, glisse = false;
+box.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; glisse = false; }, { passive: true });
+box.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) { glisse = true; aller(dx < 0 ? 1 : -1); } }, { passive: true });
+el.addEventListener('click', e => { if (glisse) { e.stopImmediatePropagation(); e.preventDefault(); glisse = false; } }, true);
 }
 
 // ─── Panneau
