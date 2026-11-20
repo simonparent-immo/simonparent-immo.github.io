@@ -545,7 +545,7 @@ ${b.statut === 'Vendu' ? `<div class="info-st">Ce bien a été vendu. Vous cherc
 <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn plein" id="bEstimV">Faire estimer mon bien</button><button class="btn" id="bQuestion">Décrire ma recherche</button></div>` : `${b.statut === 'Sous offre' || b.statut === 'Sous compromis' ? `<div class="info-st">Ce bien est ${b.statut === 'Sous offre' ? 'sous offre' : 'sous compromis'}. Contactez-moi pour en parler ou pour être prévenu en cas de désistement.</div>` : ''}
 <div style="display:flex;gap:10px;flex-wrap:wrap">
 <button class="btn plein" id="bVisite">Ce bien m'intéresse : être rappelé</button>
-<a class="btn" id="bAppel" href="tel:0683706460">Appeler Simon</a>
+<a class="btn" id="bAppel" href="tel:0683706460">Appeler Simon · <span class="mono">06 83 70 64 60</span></a>
 </div>`}
 ${b.description ? `<div class="texte">${esc(b.description)}</div>` : ''}
 <div class="duo" style="gap:16px">
@@ -885,6 +885,19 @@ function lancerQuestionnaire(Q) {
   (window.__avisP || api('avis')).then(rendreAvis).catch(() => {});
 })();
 if (window.__Q) api('questionnaireInfo', { q: window.__Q }).then(d => setTimeout(() => lancerQuestionnaire(d.q), 300)).catch(er => setTimeout(() => ouvrir('Lien non valable', '<p>' + esc(er.message) + '</p>'), 300));
+
+// Ordinateur : un lien « tel: » ouvre une fenêtre de choix d'application peu claire. On copie le numéro à la place.
+document.addEventListener('click', e => {
+const a = e.target.closest && e.target.closest('a[href^="tel:"]');
+if (!a || matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+e.preventDefault();
+const num = '06 83 70 64 60';
+try { navigator.clipboard.writeText(num); } catch (er) {}
+if (a.dataset.copie) return;
+a.dataset.copie = a.innerHTML;
+a.innerHTML = 'Numéro copié : <span class="mono">' + num + '</span>';
+setTimeout(() => { a.innerHTML = a.dataset.copie; delete a.dataset.copie; }, 3500);
+});
 </script>
 
 </body>
